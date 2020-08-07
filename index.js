@@ -25,8 +25,8 @@ var secret = setup.secret;
 var urlDB = setup.database;
 
 //Https credentials
-var privateKey  = fs.readFileSync('server.key', 'utf8');
-var certificate = fs.readFileSync('server.cert', 'utf8');
+var privateKey  = fs.readFileSync('justoahora_org.pem', 'utf8');
+var certificate = fs.readFileSync('justoahora_org.crt', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 
 app.use(function(req, res, next) {
@@ -48,16 +48,6 @@ app.use(cookieParser());
     resave: false
 })); 
 
-app.use(passport.initialize());
-app.use(passport.session());
-
-var httpServer = http.createServer(app);
-var httpsServer = https.createServer(credentials, app);
-
-httpServer.listen(8080);
-httpsServer.listen(8443);
-
-console.log('Justo Ahora is up');
 
 //Passport setup
 passport.serializeUser(function(user, done) {
@@ -72,7 +62,7 @@ passport.deserializeUser(function(obj, done) {
 passport.use(new FacebookStrategy({
     clientID: "832861053471099",
     clientSecret: "91d269205409383d34d53429b441eaa7",
-    callbackURL: "http://justoahora.org/auth/facebook/callback"
+    callbackURL: "https://justoahora.org/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
     // asynchronous verification, for effect...
@@ -84,9 +74,8 @@ passport.use(new FacebookStrategy({
 ));
 
 passport.use(new TwitterStrategy({
-    consumerKey: "pO591S3sBKNYvXmM2rSmNA",
-    consumerSecret: "5QtAZMVL24KMG0yR3X03Faex1Mp5LhWQwguWDEXMqVY",
-    callbackURL: "http://justoahora.org/auth/twitter/callback"
+    consumerKey: "XgqN68s7UmqRj3J7EzvJbdaMV",
+    consumerSecret: "61iOjxuTuAFKtmtbjNJCZLNIAErJyP0mH7viEG7wSlO6zFeGZk"
   },       
   function(token, tokenSecret, profile, cb) {
     console.log("ID :"+ profile.id)
@@ -97,6 +86,17 @@ passport.use(new TwitterStrategy({
 //REST API
 require('./rest.js')(app, jwt, MongoClient, util, setup, passport);
 
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(express.static(__dirname + '/public'));
+
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
+
+httpServer.listen(80);
+httpsServer.listen(443);
+
+console.log('Justo Ahora is up');
 
 
  

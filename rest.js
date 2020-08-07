@@ -1,6 +1,7 @@
 module.exports = function(app, jwt, MongoClient, util, setup, passport) {
 
     app.get('/policy', function(req, res) {
+		console.log('LIFE')
         res.redirect('policy.html');
     });
 
